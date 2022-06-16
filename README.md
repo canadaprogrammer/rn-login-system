@@ -273,3 +273,65 @@
           </KeyboardAvoidingContainer>
         ...
     ```
+
+## Login Screen - Password Input
+
+- On `/components/Inputs/StyledTextInput.js`
+
+  - ```js
+    ...
+    const RightIcon = styled.TouchableOpacity`
+      position: absolute;
+      top: 35px;
+      right: 15px;
+      z-index: 1;
+    `;
+
+    const StyledTextInput = ({ icon, label, isPassword, ...props }) => {
+      const [inputBackgroundColor, setInputBackgroundColor] = useState(primary);
+      const [hidePassword, setHidePassword] = useState(true);
+      ...
+      return (
+        ...
+          <InputField
+            ...
+            secureTextEntry={isPassword && hidePassword}
+          />
+          {isPassword && (
+            <RightIcon
+              onPress={() => {
+                setHidePassword(!hidePassword);
+              }}
+            >
+              <MaterialCommunityIcons
+                name={hidePassword ? 'eye-off' : 'eye'}
+                size={30}
+                color={tertiary}
+              />
+            </RightIcon>
+          )}
+        </View>
+      ...
+    ```
+
+- On `/screens/Login.js`
+
+  - ```js
+    ...
+        <Formik initialValues={{ email: '', password: '' }}>
+          ...
+              <StyledTextInput
+                label='Password'
+                icon='lock-open'
+                placeholder='********'
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                isPassword={true}
+                style={{ marginBottom: 25 }}
+              />
+            </>
+          )}
+        </Formik>
+      ...
+    ```

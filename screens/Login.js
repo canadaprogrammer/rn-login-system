@@ -12,7 +12,7 @@ const Login = () => {
         <RegularText style={{ marginBottom: 25 }}>
           Enter your account credentials
         </RegularText>
-        <Formik initialValues={{ email: '' }}>
+        <Formik initialValues={{ email: '', password: '' }}>
           {({ handleChange, handleBlur, values }) => (
             <>
               <StyledTextInput
@@ -23,6 +23,16 @@ const Login = () => {
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
+                style={{ marginBottom: 25 }}
+              />
+              <StyledTextInput
+                label='Password'
+                icon='lock-open'
+                placeholder='********'
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                isPassword={true}
                 style={{ marginBottom: 25 }}
               />
             </>

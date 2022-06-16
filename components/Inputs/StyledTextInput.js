@@ -31,8 +31,16 @@ const LeftIcon = styled.View`
   padding-right: 10px;
 `;
 
-const StyledTextInput = ({ icon, label, ...props }) => {
+const RightIcon = styled.TouchableOpacity`
+  position: absolute;
+  top: 35px;
+  right: 15px;
+  z-index: 1;
+`;
+
+const StyledTextInput = ({ icon, label, isPassword, ...props }) => {
   const [inputBackgroundColor, setInputBackgroundColor] = useState(primary);
+  const [hidePassword, setHidePassword] = useState(true);
 
   const customOnBlur = () => {
     props?.onBlur;
@@ -54,7 +62,21 @@ const StyledTextInput = ({ icon, label, ...props }) => {
         style={{ backgroundColor: inputBackgroundColor, ...props?.style }}
         onBlur={customOnBlur}
         onFocus={customOnFocus}
+        secureTextEntry={isPassword && hidePassword}
       />
+      {isPassword && (
+        <RightIcon
+          onPress={() => {
+            setHidePassword(!hidePassword);
+          }}
+        >
+          <MaterialCommunityIcons
+            name={hidePassword ? 'eye-off' : 'eye'}
+            size={30}
+            color={tertiary}
+          />
+        </RightIcon>
+      )}
     </View>
   );
 };
