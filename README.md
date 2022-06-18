@@ -335,3 +335,151 @@
         </Formik>
       ...
     ```
+
+## Login Screen - Login Button and Message
+
+- Create `/components/Texts/MsgBox.js`
+
+  - ```js
+    import React from 'react';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+
+    const { success, fail } = colors;
+
+    const StyledText = styled.Text`
+      font-size: 13px;
+      color: ${(props) => (props.success ? success : fail)};
+      text-align: center;
+    `;
+
+    const MsgBox = (props) => {
+      return <StyledText {...props}>{props.children}</StyledText>;
+    };
+
+    export default MsgBox;
+    ```
+
+- Create `/components/Buttons/RegularButton.js`
+
+  - ```js
+    import React from 'react';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+    import RegularText from '../Texts/RegularText';
+
+    const { primary, accent } = colors;
+
+    const ButtonView = styled.TouchableOpacity`
+      padding: 15px;
+      background-color: ${accent};
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      height: 60px;
+    `;
+
+    const RegularButton = (props) => {
+      return (
+        <ButtonView onPress={props.onPress} {...props}>
+          <RegularText style={[{ color: primary }, { ...props?.textStyle }]}>
+            {props.children}
+          </RegularText>
+        </ButtonView>
+      );
+    };
+
+    export default RegularButton;
+    ```
+
+- Create `/components/Text/PressableText.js`
+
+  - ```js
+    import React from 'react';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+    import SmallText from '../Texts/SmallText';
+
+    const { accent } = colors;
+
+    const StyledPressable = styled.Pressable`
+      padding-vertical: 5px;
+      align-self: center;
+    `;
+
+    const PressableText = (props) => {
+      return (
+        <StyledPressable onPress={props.onPress} {...props}>
+          <SmallText style={{ color: accent }}>{props.children}</SmallText>
+        </StyledPressable>
+      );
+    };
+
+    export default PressableText;
+    ```
+
+- On `/screens/Login.js`
+
+  - ```js
+    import React, { useState } from 'react';
+    ...
+    import MsgBox from '../components/Texts/MsgBox';
+    import RegularButton from '../components/Buttons/RegularButton';
+    import { ActivityIndicator } from 'react-native';
+    import { colors } from '../components/colors';
+    import PressableText from '../components/Texts/PressableText';
+
+    const { primary } = colors;
+
+    const Login = () => {
+      const [message, setMessage] = useState('');
+      const [isSuccessMessage, setIsSuccessMessage] = useState(false);
+
+      const handleLogin = async (credentials, setSubmitting) => {
+        try {
+          setMessage(null);
+          // call backend
+
+          // move to next page
+
+          setSubmitting(false);
+        } catch (err) {
+          setMessage(`Login Failed: ${error.message}`);
+          setSubmitting(false);
+        }
+      };
+
+      return (
+        ...
+            <Formik
+              initialValues={{ email: '', password: '' }}
+              onSubmit={(values, { setSubmitting }) => {
+                if (values.email == '' || values.password == '') {
+                  setMessage('Please fill in all fields');
+                  setSubmitting(false);
+                } else {
+                  handleLogin(values, setSubmitting);
+                }
+              }}
+            >
+              {({..., isSubmitting, handleSubmit }) => (
+                <>
+                  ...
+                  <MsgBox style={{ marginBottom: 25 }} success={isSuccessMessage}>
+                    {message || ' '}
+                  </MsgBox>
+                  {!isSubmitting && (
+                    <RegularButton onPress={handleSubmit}>Login</RegularButton>
+                  )}
+                  {isSubmitting && (
+                    <RegularButton disabled={true}>
+                      <ActivityIndicator
+                        size='small'
+                        color={primary}
+                      ></ActivityIndicator>
+                    </RegularButton>
+                  )}
+                </>
+              ...
+    ```
