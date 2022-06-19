@@ -483,3 +483,42 @@
                 </>
               ...
     ```
+
+- Create `/components/Containers/RowContainer.js`
+
+  - ```js
+    import React from 'react';
+    import styled from 'styled-components/native';
+
+    const StyledView = styled.View`
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+    `;
+
+    const RowContainer = (props) => {
+      return <StyledView {...props}>{props.children}</StyledView>;
+    };
+
+    export default RowContainer;
+    ```
+
+- On `/screens/Login.js`
+
+  - ```js
+    import RowContainer from '../components/Containers/RowContainer';
+    ...
+                  <RowContainer>
+                    <PressableText onPress={() => {}}>
+                      New account sign up
+                    </PressableText>
+                    <PressableText onPress={() => {}}>
+                      Forgot Password
+                    </PressableText>
+                  </RowContainer>
+                </>
+              )}
+            </Formik>
+            ...
+    ```

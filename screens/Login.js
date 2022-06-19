@@ -9,6 +9,7 @@ import RegularButton from '../components/Buttons/RegularButton';
 import { ActivityIndicator } from 'react-native';
 import { colors } from '../components/colors';
 import PressableText from '../components/Texts/PressableText';
+import RowContainer from '../components/Containers/RowContainer';
 
 const { primary } = colors;
 
@@ -89,6 +90,14 @@ const Login = () => {
                   ></ActivityIndicator>
                 </RegularButton>
               )}
+              <RowContainer>
+                <PressableText onPress={() => {}}>
+                  New account sign up
+                </PressableText>
+                <PressableText onPress={() => {}}>
+                  Forgot Password
+                </PressableText>
+              </RowContainer>
             </>
           )}
         </Formik>
