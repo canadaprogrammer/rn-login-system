@@ -25,7 +25,7 @@ const Login = () => {
       // move to next page
 
       setSubmitting(false);
-    } catch (err) {
+    } catch (error) {
       setMessage(`Login Failed: ${error.message}`);
       setSubmitting(false);
     }

@@ -844,9 +844,23 @@
       const [code, setCode] = useState('');
       const [pinReady, setPinReady] = useState(false);
 
+      const [message, setMessage] = useState('');
+      const [isSuccessMessage, setIsSuccessMessage] = useState(false);
       const [verifying, setVerifying] = useState(false);
 
-      const handleEmailVerification = () => {};
+      const handleEmailVerification = async (credentials, setSubmitting) => {
+        try {
+          setMessage(null);
+          // call backend
+
+          // move to next page
+
+          setSubmitting(false);
+        } catch (error) {
+          setMessage(`Login Failed: ${error.message}`);
+          setSubmitting(false);
+        }
+      };
 
       return (
         <MainContainer>
@@ -893,3 +907,151 @@
     ```
 
 - ON `App.js`, change `Signup` to `EmailVerification`for seeing Signup page
+
+## Resend Email Verification Code
+
+- Create `/components/Timers/ResendTimer.js`
+
+  - ```js
+    import React, { useState, useEffect } from 'react';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+    import SmallText from '../Texts/SmallText';
+    import PressableText from '../Texts/PressableText';
+    import RowContainer from '../Containers/RowContainer';
+
+    const { accent, success, fail } = colors;
+    const StyledView = styled.View`
+      align-items: center;
+    `;
+
+    const ResendText = styled(SmallText)`
+      color: ${accent};
+      ${(props) => {
+        const { resendStatus } = props;
+        if (resendStatus == 'Failed!') {
+          return `color: ${fail}`;
+        } else if (resendStatus == 'Sent!') {
+          return `color: ${success}`;
+        }
+      }}
+    `;
+
+    const ResendTimer = ({
+      activeResend,
+      setActiveResend,
+      targetTimeInSeconds,
+      resendEmail,
+      resendStatus,
+      ...props
+    }) => {
+      const [timeLeft, setTimeLeft] = useState(null);
+      const [targetTime, setTargetTime] = useState(null);
+
+      let resendTimerInterval;
+
+      const triggerTimer = (targetTimeInSeconds = 30) => {
+        setTargetTime(targetTimeInSeconds);
+        setActiveResend(false);
+        const finalTime = +new Date() + targetTimeInSeconds * 1000;
+        resendTimerInterval = setInterval(
+          () => calculateTimeLeft(finalTime),
+          1000
+        );
+      };
+
+      const calculateTimeLeft = (finalTime) => {
+        const difference = finalTime - +new Date();
+        if (difference >= 0) {
+          setTimeLeft(Math.round(difference / 1000));
+        } else {
+          clearInterval(resendTimerInterval);
+          setActiveResend(true);
+          setTimeLeft(null);
+        }
+      };
+
+      useEffect(() => {
+        triggerTimer(targetTimeInSeconds);
+
+        return () => {
+          clearInterval(resendTimerInterval);
+        };
+      }, []);
+
+      return (
+        <StyledView {...props}>
+          <RowContainer>
+            <SmallText>Didn't receive the email? </SmallText>
+            <PressableText
+              onPress={() => resendEmail(triggerTimer)}
+              disabled={!activeResend}
+              style={{ opacity: !activeResend ? 0.65 : 1 }}
+            >
+              <ResendText resendStatus={resendStatus}>
+                {resendStatus}
+              </ResendText>
+            </PressableText>
+          </RowContainer>
+          {!activeResend && (
+            <SmallText>
+              in{' '}
+              <SmallText style={{ fontWeight: 'bold' }}>
+                {timeLeft || targetTime}
+              </SmallText>{' '}
+              second(s)
+            </SmallText>
+          )}
+        </StyledView>
+      );
+    };
+
+    export default ResendTimer;
+    ```
+
+- On `/screens/EmailVerification.js`
+
+  - ```js
+    ...
+    import ResendTimer from '../components/Timers/ResendTimer';
+
+    const EmailVerification = () => {
+      ...
+      // Resending Email
+      const [activeResend, setActiveResend] = useState(false);
+      const [resendStatus, setResendStatus] = useState('Resend');
+      const [resendingEmail, setResendingEmail] = useState(false);
+
+      const resendEmail = async (triggerTimer) => {
+        try {
+          setResendingEmail(true);
+
+          // Make Request to Backend
+          // Update setResendStatus to 'Failed!' or 'Sent!'
+
+          setResendingEmail(false);
+          // Hold on Briefly
+          setTimeout(() => {
+            setResendStatus('Resend');
+            setActiveResend(false);
+            triggerTimer();
+          }, 5000);
+        } catch (error) {
+          setResendingEmail(false);
+          setResendStatus('Failed!');
+          alert('Email Resend Failed: ' + error.message);
+        }
+      };
+    ...
+      return (
+        ...
+            <ResendTimer
+              activeResend={activeResend}
+              setActiveResend={setActiveResend}
+              resendStatus={resendStatus}
+              resendingEmail={resendingEmail}
+              resendEmail={resendEmail}
+            />
+          </KeyboardAvoidingContainer>
+        ...
+    ```
