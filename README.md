@@ -671,3 +671,225 @@
     ```
 
 - ON `App.js`, change `Login` to `Signup`for seeing Signup page
+
+## Email Verification Screen
+
+- Create `/components/Icons/IconHeader.js`
+
+  - ```js
+    import React from 'react';
+    import { MaterialCommunityIcons } from '@expo/vector-icons';
+    import styled from 'styled-components/native';
+    import { ScreenHeight } from '../shared';
+    import { colors } from '../colors';
+
+    const { secondary, accent } = colors;
+    const IconBg = styled.View`
+      background-color: ${secondary};
+      width: ${ScreenHeight * 0.15}px;
+      height: ${ScreenHeight * 0.15}px;
+      border-radius: ${ScreenHeight * 0.2}px;
+      justify-content: center;
+      align-items: center;
+      align-self: center;
+    `;
+    const IconHeader = ({ name, size, color, ...props }) => {
+      return (
+        <IconBg style={{ ...props.style }}>
+          <MaterialCommunityIcons
+            name={name}
+            size={ScreenHeight * 0.08}
+            color={color ? color : accent}
+          />
+        </IconBg>
+      );
+    };
+
+    export default IconHeader;
+    ```
+
+- Create `/components/Inputs/StyledCodeInput.js`
+
+  - ```js
+    import React, { useRef, useState, useEffect } from 'react';
+    import styled from 'styled-components/native';
+    import { StatusBarHeight } from '../shared';
+    import { colors } from '../colors';
+
+    const { primary, secondary, tertiary, accent } = colors;
+    const CodeInputSection = styled.View`
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      margin-vertical: 35px;
+    `;
+
+    const HiddenTextInput = styled.TextInput`
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    `;
+
+    const CodeInputsContainer = styled.Pressable`
+      width: 70%;
+      flex-direction: row;
+      justify-content: space-between;
+    `;
+
+    const CodeInput = styled.View`
+      min-width: 15%;
+      padding: 12px;
+      border-bottom-width: 5px;
+      border-radius: 10px;
+      border-color: ${secondary};
+    `;
+
+    const CodeInputText = styled.Text`
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      color: ${tertiary};
+    `;
+
+    const CodeInputFocused = styled(CodeInput)`
+      border-color: ${accent};
+    `;
+
+    const StyledCodeInput = ({ code, setCode, maxLength, setPinReady }) => {
+      const codeDigitsArray = new Array(maxLength).fill(0);
+      const [inputContainerIsFocused, setInputContainerIsFocused] =
+        useState(false);
+
+      // ref for text input
+      const textInputRef = useRef(null);
+
+      const handleOnPress = () => {
+        setInputContainerIsFocused(true);
+        textInputRef?.current?.focus();
+      };
+
+      const handleOnSubmitEditing = () => {
+        setInputContainerIsFocused(false);
+      };
+
+      useEffect(() => {
+        // Toggle pinReady
+        setPinReady(code.length === maxLength);
+        return () => setPinReady(false);
+      }, [code]);
+
+      const toCodeDigitInput = (value, index) => {
+        const emptyInputChar = ' ';
+        const digit = code[index] || emptyInputChar;
+
+        // Formatting
+        const isCurrentDigit = index === code.length;
+        const isLastDigit = index === maxLength - 1;
+        const isCodeFull = code.length === maxLength;
+
+        const isDigitFocused = isCurrentDigit || (isLastDigit && isCodeFull);
+
+        const StyledCodeInput =
+          inputContainerIsFocused && isDigitFocused
+            ? CodeInputFocused
+            : CodeInput;
+
+        return (
+          <StyledCodeInput key={index}>
+            <CodeInputText>{digit}</CodeInputText>
+          </StyledCodeInput>
+        );
+      };
+
+      return (
+        <CodeInputSection>
+          <CodeInputsContainer onPress={handleOnPress}>
+            {codeDigitsArray.map(toCodeDigitInput)}
+          </CodeInputsContainer>
+          <HiddenTextInput
+            keyboardType='number-pad'
+            returnKeyType='done'
+            textContentType='oneTimeCode'
+            ref={textInputRef}
+            value={code}
+            onChangeText={setCode}
+            maxLength={maxLength}
+            onSubmitEditing={handleOnSubmitEditing}
+          />
+        </CodeInputSection>
+      );
+    };
+
+    export default StyledCodeInput;
+    ```
+
+- Create `/screen/EmailVerification.js`
+
+  - ```js
+    import React, { useState } from 'react';
+    import MainContainer from '../components/Containers/MainContainer';
+    import KeyboardAvoidingContainer from '../components/Containers/KeyboardAvoidingContainer';
+    import RegularText from '../components/Texts/RegularText';
+    import RegularButton from '../components/Buttons/RegularButton';
+    import { ActivityIndicator } from 'react-native';
+    import { colors } from '../components/colors';
+    import IconHeader from '../components/Icons/IconHeader';
+    import StyledCodeInput from '../components/Inputs/StyledCodeInput';
+    const { primary, secondary, lightGray } = colors;
+
+    const EmailVerification = () => {
+      // Code Input
+      const MAX_CODE_LENGTH = 4;
+      const [code, setCode] = useState('');
+      const [pinReady, setPinReady] = useState(false);
+
+      const [verifying, setVerifying] = useState(false);
+
+      const handleEmailVerification = () => {};
+
+      return (
+        <MainContainer>
+          <KeyboardAvoidingContainer>
+            <IconHeader name='lock-open' style={{ marginBottom: 30 }} />
+            <RegularText style={{ marginBottom: 25, textAlign: 'center' }}>
+              Enter the 4-digit code sent to your email
+            </RegularText>
+            <StyledCodeInput
+              code={code}
+              setCode={setCode}
+              maxLength={MAX_CODE_LENGTH}
+              setPinReady={setPinReady}
+            />
+
+            {!verifying && pinReady && (
+              <RegularButton onPress={handleEmailVerification}>
+                Verify
+              </RegularButton>
+            )}
+            {!verifying && !pinReady && (
+              <RegularButton
+                disabled={true}
+                style={{ backgroundColor: secondary }}
+                textStyle={{ color: lightGray }}
+              >
+                Verify
+              </RegularButton>
+            )}
+            {verifying && (
+              <RegularButton disabled={true}>
+                <ActivityIndicator
+                  size='small'
+                  color={primary}
+                ></ActivityIndicator>
+              </RegularButton>
+            )}
+          </KeyboardAvoidingContainer>
+        </MainContainer>
+      );
+    };
+
+    export default EmailVerification;
+    ```
+
+- ON `App.js`, change `Signup` to `EmailVerification`for seeing Signup page
