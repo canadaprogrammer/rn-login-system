@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import EmailVerification from './screens/EmailVerification';
+import ForgotPassword from './screens/ForgotPassword';
 
 export default function App() {
   return (
     <>
       <StatusBar style='light' />
-      <EmailVerification />
+      <ForgotPassword />
     </>
   );
 }
