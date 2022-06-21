@@ -8,6 +8,7 @@ import { colors } from '../components/colors';
 import IconHeader from '../components/Icons/IconHeader';
 import StyledCodeInput from '../components/Inputs/StyledCodeInput';
 import ResendTimer from '../components/Timers/ResendTimer';
+import MessageModal from '../components/Modals/MessageModal';
 
 const { primary, secondary, lightGray } = colors;
 
@@ -17,15 +18,34 @@ const EmailVerification = () => {
   const [code, setCode] = useState('');
   const [pinReady, setPinReady] = useState(false);
 
-  const [message, setMessage] = useState('');
-  const [isSuccessMessage, setIsSuccessMessage] = useState(false);
-
   const [verifying, setVerifying] = useState(false);
 
   // Resending Email
   const [activeResend, setActiveResend] = useState(false);
   const [resendStatus, setResendStatus] = useState('Resend');
   const [resendingEmail, setResendingEmail] = useState(false);
+
+  // Modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessageType, setModalMessageType] = useState('');
+  const [headerText, setHeaderText] = useState('');
+  const [modalMessage, setModalMessage] = useState();
+  const [buttonText, setButtonText] = useState();
+
+  const buttonHandler = () => {
+    if (modalMessageType == 'success') {
+      // do something
+    }
+    setModalVisible(false);
+  };
+
+  const showModal = (type, headerText, message, buttonText) => {
+    setModalMessageType(type);
+    setHeaderText(headerText);
+    setModalMessage(message);
+    setButtonText(buttonText);
+    setModalVisible(true);
+  };
 
   const resendEmail = async (triggerTimer) => {
     try {
@@ -48,17 +68,21 @@ const EmailVerification = () => {
     }
   };
 
-  const handleEmailVerification = async (credentials, setSubmitting) => {
+  const handleEmailVerification = async () => {
     try {
-      setMessage(null);
+      setVerifying(true);
       // call backend
 
-      // move to next page
-
-      setSubmitting(false);
+      setVerifying(false);
+      return showModal(
+        'success',
+        'All Good!',
+        'Your email has been verified.',
+        'Proceed'
+      );
     } catch (error) {
-      setMessage(`Login Failed: ${error.message}`);
-      setSubmitting(false);
+      setVerifying(false);
+      return showModal('failed', 'Failed!', error.message, 'Close');
     }
   };
 
@@ -101,6 +125,14 @@ const EmailVerification = () => {
           resendStatus={resendStatus}
           resendingEmail={resendingEmail}
           resendEmail={resendEmail}
+        />
+        <MessageModal
+          modalVisible={modalVisible}
+          buttonHandler={buttonHandler}
+          type={modalMessageType}
+          headerText={headerText}
+          message={modalMessage}
+          buttonText={buttonText}
         />
       </KeyboardAvoidingContainer>
     </MainContainer>
