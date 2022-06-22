@@ -90,7 +90,7 @@ const EmailVerification = () => {
     <MainContainer>
       <KeyboardAvoidingContainer>
         <IconHeader name='lock-open' style={{ marginBottom: 30 }} />
-        <RegularText style={{ marginBottom: 25, textAlign: 'center' }}>
+        <RegularText style={{ textAlign: 'center' }}>
           Enter the 4-digit code sent to your email
         </RegularText>
         <StyledCodeInput

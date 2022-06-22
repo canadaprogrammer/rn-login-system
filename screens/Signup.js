@@ -46,7 +46,8 @@ const Signup = () => {
           onSubmit={(values, { setSubmitting }) => {
             if (
               values.fullName == '' ||
-              (values.email == '') | (values.password == '') ||
+              values.email == '' ||
+              values.password == '' ||
               values.confirmPassword == ''
             ) {
               setMessage('Please fill in all fields');
