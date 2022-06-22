@@ -11,6 +11,7 @@ import { colors } from '../components/colors';
 import StyledCodeInput from '../components/Inputs/StyledCodeInput';
 import ResendTimer from '../components/Timers/ResendTimer';
 import styled from 'styled-components/native';
+import MessageModal from '../components/Modals/MessageModal';
 
 const { primary } = colors;
 
@@ -55,17 +56,43 @@ const ResetPassword = () => {
     }
   };
 
+  // Modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessageType, setModalMessageType] = useState('');
+  const [headerText, setHeaderText] = useState('');
+  const [modalMessage, setModalMessage] = useState();
+  const [buttonText, setButtonText] = useState();
+
+  const buttonHandler = () => {
+    if (modalMessageType == 'success') {
+      // do something
+    }
+    setModalVisible(false);
+  };
+
+  const showModal = (type, headerText, message, buttonText) => {
+    setModalMessageType(type);
+    setHeaderText(headerText);
+    setModalMessage(message);
+    setButtonText(buttonText);
+    setModalVisible(true);
+  };
+
   const handleOnSubmit = async (credentials, setSubmitting) => {
     try {
       setMessage(null);
       // call backend
 
-      // move to next page
-
       setSubmitting(false);
+      return showModal(
+        'success',
+        'All Good!',
+        'Your password has been reset.',
+        'Proceed'
+      );
     } catch (error) {
-      setMessage(`Request Failed: ${error.message}`);
       setSubmitting(false);
+      return showModal('failed', 'Failed!', error.message, 'Close');
     }
   };
 
@@ -99,6 +126,7 @@ const ResetPassword = () => {
               setMessage('Confirm password does not matched');
               setSubmitting(false);
             } else {
+              setMessage('');
               handleOnSubmit(values, setSubmitting);
             }
           }}
@@ -137,7 +165,7 @@ const ResetPassword = () => {
                 {message || ' '}
               </MsgBox>
               {!isSubmitting && (
-                <RegularButton disabled={pinReady} onPress={handleSubmit}>
+                <RegularButton disabled={!pinReady} onPress={handleSubmit}>
                   Submit
                 </RegularButton>
               )}
@@ -152,6 +180,14 @@ const ResetPassword = () => {
             </FormWrapper>
           )}
         </Formik>
+        <MessageModal
+          modalVisible={modalVisible}
+          buttonHandler={buttonHandler}
+          type={modalMessageType}
+          headerText={headerText}
+          message={modalMessage}
+          buttonText={buttonText}
+        />
       </KeyboardAvoidingContainer>
     </MainContainer>
   );

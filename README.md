@@ -1403,6 +1403,7 @@
                   setMessage('Confirm password does not matched');
                   setSubmitting(false);
                 } else {
+                  setMessage('');
                   handleOnSubmit(values, setSubmitting);
                 }
               }}
@@ -1444,7 +1445,7 @@
                     {message || ' '}
                   </MsgBox>
                   {!isSubmitting && (
-                    <RegularButton disabled={pinReady} onPress={handleSubmit}>
+                    <RegularButton disabled={!pinReady} onPress={handleSubmit}>
                       Submit
                     </RegularButton>
                   )}
@@ -1468,3 +1469,61 @@
     ```
 
 - On `App.js`, change `ForgotPassword` to `ResetPassword`
+
+## Reset Password - Message Modal
+
+- On `/screens/ResetPassword.js`
+
+  - ```js
+    ...
+    import MessageModal from '../components/Modals/MessageModal';
+    ...
+      // Modal
+      const [modalVisible, setModalVisible] = useState(false);
+      const [modalMessageType, setModalMessageType] = useState('');
+      const [headerText, setHeaderText] = useState('');
+      const [modalMessage, setModalMessage] = useState();
+      const [buttonText, setButtonText] = useState();
+
+      const buttonHandler = () => {
+        if (modalMessageType == 'success') {
+          // do something
+        }
+        setModalVisible(false);
+      };
+
+      const showModal = (type, headerText, message, buttonText) => {
+        setModalMessageType(type);
+        setHeaderText(headerText);
+        setModalMessage(message);
+        setButtonText(buttonText);
+        setModalVisible(true);
+      };
+
+      const handleOnSubmit = async (credentials, setSubmitting) => {
+        try {
+          setMessage(null);
+          // call backend
+
+          setSubmitting(false);
+          return showModal(
+            'success',
+            'All Good!',
+            'Your password has been reset.',
+            'Proceed'
+          );
+        } catch (error) {
+          setSubmitting(false);
+          return showModal('failed', 'Failed!', error.message, 'Close');
+        }
+      };
+      ...
+            <MessageModal
+              modalVisible={modalVisible}
+              buttonHandler={buttonHandler}
+              type={modalMessageType}
+              headerText={headerText}
+              message={modalMessage}
+              buttonText={buttonText}
+            />
+    ```
