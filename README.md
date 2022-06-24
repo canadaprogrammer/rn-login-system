@@ -1723,3 +1723,174 @@
 - On `/components/Containers/MainContainer.js`, remove `padding-top: ${StatusBarHeight + 30}px;`
 
 - On `App.js`, change `Dashboard` to `RootStack`
+
+## Dashboard Screen - Profile Section
+
+- On `/components/Modals/MessageModal.js`, export styled components
+
+- Create `/components/Modals/ProfileModal.js`
+
+  - ```js
+    import React from 'react';
+    import { Modal, ActivityIndicator } from 'react-native';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+    import { MaterialCommunityIcons } from '@expo/vector-icons';
+    import BigText from '../Texts/BigText';
+    import RegularButton from '../Buttons/RegularButton';
+    import { ModalPressableContainer, ModalView } from './MessageModal';
+
+    const { primary, tertiary, accent, secondary } = colors;
+
+    const StyledView = styled.View`
+      background-color: ${primary};
+      flex-direction: column;
+      height: 65px;
+      width: 65px;
+      border-radius: 15px;
+      justify-content: center;
+      align-items: center;
+      border-width: 2px;
+      border-color: ${secondary};
+    `;
+
+    const ProfileModal = ({
+      modalVisible,
+      buttonHandler,
+      headerText,
+      loggingOut,
+      hideModal,
+    }) => {
+      return (
+        <Modal animationType='slide' visible={modalVisible} transparent={true}>
+          <ModalPressableContainer onPress={hideModal}>
+            <ModalView>
+              <StyledView>
+                <MaterialCommunityIcons
+                  name='account'
+                  size={55}
+                  color={accent}
+                />
+              </StyledView>
+
+              <BigText
+                style={{ fontSize: 25, color: tertiary, marginVertical: 20 }}
+              >
+                {headerText}
+              </BigText>
+              {!loggingOut && (
+                <RegularButton onPress={buttonHandler}>Logout</RegularButton>
+              )}
+              {loggingOut && (
+                <RegularButton disabled={true}>
+                  <ActivityIndicator size='small' color={primary} />
+                </RegularButton>
+              )}
+            </ModalView>
+          </ModalPressableContainer>
+        </Modal>
+      );
+    };
+
+    export default ProfileModal;
+    ```
+
+- Create `/components/Buttons/Avatar.js`
+
+  - ```js
+    import React, { useState } from 'react';
+    import styled from 'styled-components/native';
+    import { colors } from '../colors';
+    import { MaterialCommunityIcons } from '@expo/vector-icons';
+    import ProfileModal from '../Modals/ProfileModal';
+
+    const { primary, secondary, accent } = colors;
+    const StyledView = styled.TouchableOpacity`
+      background-color: ${primary};
+      flex-direction: column;
+      height: 45px;
+      width: 45px;
+      border-radius: 15px;
+      justify-content: center;
+      align-items: center;
+      border-width: 2px;
+      border-color: ${secondary};
+    `;
+
+    const Avatar = (props) => {
+      // Modal
+      const [modalVisible, setModalVisible] = useState(false);
+      const [headerText, setHeaderText] = useState('');
+      const [loggingOut, setLoggingOut] = useState(false);
+
+      const onLogout = async () => {
+        setLoggingOut(true);
+
+        // clear user credentials
+
+        setLoggingOut(false);
+        setModalVisible(false);
+
+        // move to login
+      };
+
+      const showProfileModal = (user) => {
+        setHeaderText(user);
+        setModalVisible(true);
+      };
+
+      const hideModal = () => {
+        setModalVisible(false);
+      };
+
+      const onAvatarPress = () => {
+        showProfileModal('Jin Park');
+      };
+      return (
+        <>
+          <StyledView onPress={onAvatarPress} style={props.imgContainerStyle}>
+            <MaterialCommunityIcons name='account' size={35} color={accent} />
+          </StyledView>
+          <ProfileModal
+            modalVisible={modalVisible}
+            headerText={headerText}
+            buttonHandler={onLogout}
+            loggingOut={loggingOut}
+            hideModal={hideModal}
+          />
+        </>
+      );
+    };
+
+    export default Avatar;
+    ```
+
+- On `/navigators/RootStack.js`
+
+  - ```js
+    ...
+    import Avatar from '../components/Buttons/Avatar';
+
+    const { accent, secondary, darkGray } = colors;
+    ...
+            initialRouteName='Dashboard'
+          >
+          ...
+            <Stack.Screen
+              name='Dashboard'
+              component={Dashboard}
+              options={{
+                headerStyle: {
+                  height: 100,
+                  backgroundColor: darkGray,
+                  borderBottomWidth: 0,
+                  shadowColor: 'transparent',
+                  shadowOpacity: 0,
+                  elevation: 0,
+                },
+                headerRight: () => <Avatar />,
+              }}
+            />
+          </Stack.Navigator>
+          ...
+    ```

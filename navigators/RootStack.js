@@ -10,8 +10,9 @@ import EmailVerification from '../screens/EmailVerification';
 import Dashboard from '../screens/Dashboard';
 import ForgotPassword from '../screens/ForgotPassword';
 import ResetPassword from '../screens/ResetPassword';
+import Avatar from '../components/Buttons/Avatar';
 
-const { accent, secondary } = colors;
+const { accent, secondary, darkGray } = colors;
 const Stack = createStackNavigator();
 
 const RootStack = () => {
@@ -36,7 +37,7 @@ const RootStack = () => {
             paddingRight: 25,
           },
         }}
-        initialRouteName='EmailVerification'
+        initialRouteName='Dashboard'
       >
         <Stack.Screen name='Login' component={Login} />
         <Stack.Screen name='Signup' component={Signup} />
@@ -55,7 +56,21 @@ const RootStack = () => {
           component={ResetPassword}
           options={{ headerTitle: 'Reset Password' }}
         />
-        <Stack.Screen name='Dashboard' component={Dashboard} />
+        <Stack.Screen
+          name='Dashboard'
+          component={Dashboard}
+          options={{
+            headerStyle: {
+              height: 100,
+              backgroundColor: darkGray,
+              borderBottomWidth: 0,
+              shadowColor: 'transparent',
+              shadowOpacity: 0,
+              elevation: 0,
+            },
+            headerRight: () => <Avatar />,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

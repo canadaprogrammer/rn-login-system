@@ -9,7 +9,7 @@ import RegularButton from '../Buttons/RegularButton';
 
 const { primary, black, tertiary, success, fail } = colors;
 
-const ModalPressableContainer = styled.Pressable`
+export const ModalPressableContainer = styled.Pressable`
   flex: 1;
   padding: 25px;
   background-color: rgba(0, 0, 0, 0.7);
@@ -17,7 +17,7 @@ const ModalPressableContainer = styled.Pressable`
   align-items: center;
 `;
 
-const ModalView = styled.View`
+export const ModalView = styled.View`
   background-color: ${primary};
   border-radius: 20px;
   width: 100%;
