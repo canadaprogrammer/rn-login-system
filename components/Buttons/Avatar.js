@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { colors } from '../colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProfileModal from '../Modals/ProfileModal';
+import { useNavigation } from '@react-navigation/native';
 
 const { primary, secondary, accent } = colors;
 const StyledView = styled.TouchableOpacity`
@@ -23,7 +24,12 @@ const Avatar = (props) => {
   const [headerText, setHeaderText] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const onLogout = async () => {
+  const navigation = useNavigation();
+  const moveTo = (screen, payload) => {
+    navigation.navigate(screen, { ...payload });
+  };
+
+  const onLogout = () => {
     setLoggingOut(true);
 
     // clear user credentials
@@ -32,6 +38,7 @@ const Avatar = (props) => {
     setModalVisible(false);
 
     // move to login
+    moveTo('Login');
   };
 
   const showProfileModal = (user) => {

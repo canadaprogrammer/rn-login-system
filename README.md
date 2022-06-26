@@ -1894,3 +1894,82 @@
           </Stack.Navigator>
           ...
     ```
+
+## Moving Between Screens
+
+- On `/navigator/RootStack.js`, change to `initialRouteName='Login'`
+
+- On `/screens/Login.js`
+
+  - ```js
+    ...
+    const Login = ({ navigation }) => {
+      ...
+      const moveTo = (screen, payload) => {
+        navigation.navigate(screen, { ...payload });
+      };
+      ...
+          // move to next page
+          moveTo('Dashboard');
+          ...
+                  <RowContainer>
+                    <PressableText
+                      onPress={() => {
+                        moveTo('Signup');
+                      }}
+                    >
+                      New account sign up
+                    </PressableText>
+                    <PressableText
+                      onPress={() => {
+                        moveTo('ForgotPassword');
+                      }}
+                    >
+                      Forgot Password
+                    ...
+    ```
+
+- On `/screens/Signup.js`
+
+  - ```js
+    const Signup = ({ navigation }) => {
+      const [message, setMessage] = useState('');
+      const [isSuccessMessage, setIsSuccessMessage] = useState(false);
+
+      const moveTo = (screen, payload) => {
+        navigation.navigate(screen, { ...payload });
+      };
+
+      const handleSignup = async (credentials, setSubmitting) => {
+        ...
+          // move to next page
+          moveTo('EmailVerification');
+          ...
+                  <PressableText
+                    style={{ paddingVertical: 15 }}
+                    onPress={() => {
+                      moveTo('Login');
+                    }}
+                  >
+                  ...
+    ```
+
+- Add `moveTo` on `screens` like above screens
+
+- On `/components/Buttons/Avatar.js`, use `useNavigation`
+
+  - ```js
+    import { useNavigation } from '@react-navigation/native';
+    ...
+      const navigation = useNavigation();
+      const moveTo = (screen, payload) => {
+        navigation.navigate(screen, { ...payload });
+      };
+
+      const onLogout = () => {
+        ...
+        // move to login
+        moveTo('Login');
+      };
+      ...
+    ```
